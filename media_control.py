@@ -93,6 +93,12 @@ while cap.isOpened():
             if current_time - LAST_ACTION_TIME > MEDIA_COOLDOWN:
                 pyautogui.press('playpause')
                 LAST_ACTION_TIME = current_time
+
+        thumb_extended = landmarks[4].x > landmarks[3].x # For Right Hand
+        if index_up and not middle_up: 
+            return "VOLUME_UP"
+        elif not index_up and thumb_extended: 
+            return "VOLUME_DOWN"
         
         elif gesture_name == "INDEX_UP_VOL":
             if current_time - LAST_ACTION_TIME > VOL_COOLDOWN:

@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gesture Control | Jetson Nano</title>
+    <meta name="description" content="Real-time hand gesture recognition for media control powered by MediaPipe on Jetson Nano.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <!-- Camera Feed -->
+        <div class="video-section" id="video-section">
+            <div class="live-indicator">
+                <span class="dot"></span>
+                LIVE
+            </div>
+            <img id="video-feed" src="{{ url_for('video_feed') }}" alt="Camera Feed">
+        </div>
+
+        <!-- Sidebar -->
+        <div class="sidebar">
+            <div class="header">
+                <h1>Gesture Control</h1>
+                <p>HCI Prototype</p>
+            </div>
+
+            <div class="status-card">
+                <div id="error-banner" class="error-banner" style="display:none;">
+                    MediaPipe is unavailable. Check Python version.
+                </div>
+
+                <div class="status-item">
+                    <div class="label">Gesture</div>
+                    <div id="gesture" class="value gesture-value">NONE</div>
+                </div>
+
+                <div class="status-row">
+                    <div class="status-item">
+                        <div class="label">FPS</div>
+                        <div id="fps" class="value">0</div>
+                    </div>
+                    <div class="status-item">
+                        <div class="label">Latency</div>
+                        <div class="value"><span id="latency">0</span> ms</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="gesture-guide">
+                <div class="label">Gesture Guide</div>
+                <div class="guide-row"><span class="guide-icon">🖐</span> Play / Pause</div>
+                <div class="guide-row"><span class="guide-icon">☝️</span> Volume Up</div>
+                <div class="guide-row"><span class="guide-icon">✊</span> Mute</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const videoFeed = document.getElementById('video-feed');
+        const errorBanner = document.getElementById('error-banner');
+
+        /* Poll gesture status */
+        function poll() {
+            fetch('/status')
+                .then(r => r.json())
+                .then(d => {
+                    document.getElementById('gesture').textContent = d.gesture;
+                    document.getElementById('fps').textContent     = d.fps;
+                    document.getElementById('latency').textContent  = d.latency;
+                    errorBanner.style.display = d.error ? 'block' : 'none';
+                })
+                .catch(() => {});
+        }
+        setInterval(poll, 500);
+
+        /* Auto-reconnect camera on error */
+        videoFeed.onerror = () => {
+            setTimeout(() => {
+                videoFeed.src = '/video_feed?t=' + Date.now();
+            }, 2000);
+        };
+    </script>
+</body>
+</html>

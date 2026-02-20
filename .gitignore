@@ -1,3 +1,23 @@
+# Virtual environment
+venv/
+
+# Model binary (downloaded at runtime)
 hand_landmarker.task
 
-venv/
+# Python cache
+__pycache__/
+*.py[cod]
+*.pyo
+
+# OS junk
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+
+# Test artifacts
+test_cam.jpg
+test_cam.py
+test_mp.py
